@@ -61,7 +61,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         };
 
         // Post data to server
-        fetch('https://isattendance.vercel.app/api/register', {
+        fetch('https://riteshinternship-khaki.vercel.app/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
