@@ -157,9 +157,6 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-app.get('/api/test',async(req,res)=>{
-    res.send('test')
-})
 // Mark attendance
 app.post('/api/attendance', authenticateToken, async (req, res) => {
     try {
