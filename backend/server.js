@@ -196,12 +196,15 @@ console.log('user',user)
     }
 });
 
-// View attendance records
-app.get('/api/records', authenticateToken, async (req, res) => {
+
+      app.get('/api/records', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.userId; // Assuming user id is stored in req.user from the authentication middleware
         const userRole = req.user.role; // Assuming user role is stored in req.user from the authentication middleware
         let records;
+        
+        console.log('userId', userId, userRole);
+        
         if (userRole === 'admin') {
             // Admin can see all records
             records = await Attendance.find({ isAttendance: true })
@@ -215,22 +218,27 @@ app.get('/api/records', authenticateToken, async (req, res) => {
         } else {
             return res.status(403).json({ error: 'Access denied' });
         }
-console.log('formatted',records)
-        const formattedRecords = records.map(record => ({
-            firstName: record.user.firstName,
-            lastName: record.user.lastName,
-            emailOrMobile: record.user.emailOrMobile,
-            timestamp: record.timestamp,
-            userId: record.user._id
-        }));
-console.log('jjjj',formattedRecords)
+
+        console.log('formatted', records);
+
+        // Format records and handle potential null values
+        const formattedRecords = records
+            .filter(record => record.user) // Ensure user is not null or undefined
+            .map(record => ({
+                firstName: record.user.firstName,
+                lastName: record.user.lastName,
+                emailOrMobile: record.user.emailOrMobile,
+                timestamp: record.timestamp,
+                userId: record.user._id
+            }));
+
+        // console.log('>>>>>>>>>>>>>>>>>>>>>', formattedRecords);
         res.json(formattedRecords);
     } catch (error) {
         console.error('Error retrieving attendance records:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 // Edit user record
 app.put('/api/records/:userId', authenticateToken, isAdmin, async (req, res) => {
