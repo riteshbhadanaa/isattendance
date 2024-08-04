@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,6 +71,23 @@
         .register-link a:hover {
             text-decoration: underline;
         }
+        .or-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dddfe2;
+        }
+        .or-divider span {
+            padding: 0 10px;
+            color: #606770;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -86,6 +104,24 @@
             
             <button type="submit">Login</button>
         </form>
+        <div class="or-divider">
+            <span>OR</span>
+        </div>
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
         <div class="register-link">
             <p>Don't have an account? <a href="register.html">Sign Up</a></p>
         </div>
@@ -146,6 +182,34 @@
                     window.location.href = 'attendance.html';
                 } else {
                     alert('Login failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function handleCredentialResponse(response) {
+            // Send the ID token to your server
+            const id_token = response.credential;
+            
+            fetch('https://riteshinternship-khaki.vercel.app/api/google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: id_token })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userId', data.userId);
+
+                    alert('Google login successful');
+                    window.location.href = 'attendance.html';
+                } else {
+                    alert('Google login failed');
                 }
             })
             .catch(error => {
