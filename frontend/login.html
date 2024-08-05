@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login with SSO</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,7 +70,26 @@
         .register-link a:hover {
             text-decoration: underline;
         }
-        .g-signin2 {
+        .or-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dddfe2;
+        }
+        .or-divider span {
+            padding: 0 10px;
+            color: #606770;
+            font-size: 14px;
+        }
+        .g_id_signin {
+            display: flex;
+            justify-content: center;
             margin-top: 1rem;
         }
     </style>
@@ -90,7 +109,27 @@
             
             <button type="submit">Login</button>
         </form>
-        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+        <div class="or-divider">
+            <span>OR</span>
+        </div>
+
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+
         <div class="register-link">
             <p>Don't have an account? <a href="register.html">Sign Up</a></p>
         </div>
@@ -122,8 +161,8 @@
             if (password === '') {
                 passwordError.textContent = 'Password is required';
                 isValid = false;
-            } else if (password.length < 4) {
-                passwordError.textContent = 'Password must be at least 4 characters long';
+            } else if (password.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters long';
                 isValid = false;
             }
 
@@ -134,7 +173,8 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            fetch('https://riteshinternship-khaki.vercel.app/api/login', {
+            // In a real application, use HTTPS
+            fetch('https://your-api-endpoint.com/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -146,55 +186,43 @@
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
-
                     alert('Login successful');
-                    window.location.href = 'attendance.html';
+                    window.location.href = 'dashboard.html';
                 } else {
-                    alert('Login failed');
+                    alert('Login failed: ' + (data.message || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                alert('An error occurred during login');
             });
         }
 
-        function onSignIn(googleUser) {
-            const id_token = googleUser.getAuthResponse().id_token;
-
-            fetch('https://riteshinternship-khaki.vercel.app/api/google-login', {
+        function handleCredentialResponse(response) {
+            // Send the ID token to your server
+            fetch('https://your-api-endpoint.com/api/google-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ token: id_token })
+                body: JSON.stringify({ token: response.credential })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
-
-                    alert('Login successful');
-                    window.location.href = 'attendance.html';
+                    alert('Google Sign-In successful');
+                    window.location.href = 'dashboard.html';
                 } else {
-                    alert('Login failed');
+                    alert('Google Sign-In failed: ' + (data.message || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                alert('An error occurred during Google Sign-In');
             });
         }
-
-        window.onload = function () {
-            google.accounts.id.initialize({
-                client_id: '162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com',
-                callback: onSignIn
-            });
-            google.accounts.id.renderButton(
-                document.querySelector('.g-signin2'),
-                { theme: 'outline', size: 'large' }
-            );
-        };
     </script>
 </body>
 </html>
