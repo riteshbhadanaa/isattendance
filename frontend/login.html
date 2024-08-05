@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login with SSO</title>
+    <title>Login with Google SSO</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -87,10 +87,29 @@
             color: #606770;
             font-size: 14px;
         }
-        .g_id_signin {
+        #googleSignInButton {
             display: flex;
             justify-content: center;
-            margin-top: 1rem;
+            align-items: center;
+            background-color: #ffffff;
+            color: #757575;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        #googleSignInButton:hover {
+            background-color: #f7f8f8;
+        }
+        #googleSignInButton img {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
         }
     </style>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -114,21 +133,10 @@
             <span>OR</span>
         </div>
 
-        <div id="g_id_onload"
-             data-client_id="YOUR_GOOGLE_CLIENT_ID"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="rectangular"
-             data-theme="outline"
-             data-text="signin_with"
-             data-size="large"
-             data-logo_alignment="left">
-        </div>
+        <button id="googleSignInButton">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+            Sign in with Google
+        </button>
 
         <div class="register-link">
             <p>Don't have an account? <a href="register.html">Sign Up</a></p>
@@ -198,6 +206,7 @@
             });
         }
 
+        // Google Sign-In Configuration
         function handleCredentialResponse(response) {
             // Send the ID token to your server
             fetch('https://your-api-endpoint.com/api/google-login', {
@@ -223,6 +232,17 @@
                 alert('An error occurred during Google Sign-In');
             });
         }
+
+        // Initialize Google Sign-In
+        google.accounts.id.initialize({
+            client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+            callback: handleCredentialResponse
+        });
+
+        // Render Google Sign-In button
+        document.getElementById('googleSignInButton').addEventListener('click', () => {
+            google.accounts.id.prompt();
+        });
     </script>
 </body>
 </html>
