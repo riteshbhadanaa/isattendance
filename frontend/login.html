@@ -70,8 +70,7 @@
         .register-link a:hover {
             text-decoration: underline;
         }
-        .g_id_signin {
-            width: 100%;
+        .g-signin2 {
             margin-top: 1rem;
         }
     </style>
@@ -91,19 +90,7 @@
             
             <button type="submit">Login</button>
         </form>
-        <div id="g_id_onload"
-             data-client_id="162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com"
-             data-login_uri="https://riteshinternship-khaki.vercel.app/api/google-login"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="rectangular"
-             data-theme="outline"
-             data-text="sign_in_with"
-             data-size="large"
-             data-logo_alignment="left">
-        </div>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
         <div class="register-link">
             <p>Don't have an account? <a href="register.html">Sign Up</a></p>
         </div>
@@ -171,21 +158,15 @@
             });
         }
 
-        function handleCredentialResponse(response) {
-            const responsePayload = decodeJwtResponse(response.credential);
-            console.log("ID: " + responsePayload.sub);
-            console.log('Full Name: ' + responsePayload.name);
-            console.log('Given Name: ' + responsePayload.given_name);
-            console.log('Family Name: ' + responsePayload.family_name);
-            console.log("Image URL: " + responsePayload.picture);
-            console.log("Email: " + responsePayload.email);
+        function onSignIn(googleUser) {
+            const id_token = googleUser.getAuthResponse().id_token;
 
             fetch('https://riteshinternship-khaki.vercel.app/api/google-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ token: response.credential })
+                body: JSON.stringify({ token: id_token })
             })
             .then(response => response.json())
             .then(data => {
@@ -204,24 +185,14 @@
             });
         }
 
-        function decodeJwtResponse(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-
-            return JSON.parse(jsonPayload);
-        }
-
         window.onload = function () {
             google.accounts.id.initialize({
                 client_id: '162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com',
-                callback: handleCredentialResponse
+                callback: onSignIn
             });
             google.accounts.id.renderButton(
-                document.querySelector('.g_id_signin'), 
-                { theme: 'outline', size: 'large' } 
+                document.querySelector('.g-signin2'),
+                { theme: 'outline', size: 'large' }
             );
         };
     </script>
