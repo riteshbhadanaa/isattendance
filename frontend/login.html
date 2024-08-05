@@ -70,7 +70,12 @@
         .register-link a:hover {
             text-decoration: underline;
         }
+        .g_id_signin {
+            width: 100%;
+            margin-top: 1rem;
+        }
     </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="login-container">
@@ -86,6 +91,15 @@
             
             <button type="submit">Login</button>
         </form>
+        <div class="g_id_signin"
+             data-client_id="162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com"
+             data-context="signin"
+             data-width="300"
+             data-height="50"
+             data-longtitle="true"
+             data-theme="outline"
+             data-type="standard">
+        </div>
         <div class="register-link">
             <p>Don't have an account? <a href="register.html">Sign Up</a></p>
         </div>
@@ -152,6 +166,60 @@
                 console.error('Error:', error);
             });
         }
+
+        function handleCredentialResponse(response) {
+            const responsePayload = decodeJwtResponse(response.credential);
+            console.log("ID: " + responsePayload.sub);
+            console.log('Full Name: ' + responsePayload.name);
+            console.log('Given Name: ' + responsePayload.given_name);
+            console.log('Family Name: ' + responsePayload.family_name);
+            console.log("Image URL: " + responsePayload.picture);
+            console.log("Email: " + responsePayload.email);
+
+            fetch('https://riteshinternship-khaki.vercel.app/api/google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: response.credential })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userId', data.userId);
+
+                    alert('Login successful');
+                    window.location.href = 'attendance.html';
+                } else {
+                    alert('Login failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function decodeJwtResponse(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
+
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: '162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com',
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.querySelector('.g_id_signin'), 
+                { theme: 'outline', size: 'large' } 
+            );
+        };
     </script>
 </body>
 </html>
