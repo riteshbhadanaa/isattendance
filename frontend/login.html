@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login with Google SSO</title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,49 +70,7 @@
         .register-link a:hover {
             text-decoration: underline;
         }
-        .or-divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .or-divider::before,
-        .or-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #dddfe2;
-        }
-        .or-divider span {
-            padding: 0 10px;
-            color: #606770;
-            font-size: 14px;
-        }
-        #googleSignInButton {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #ffffff;
-            color: #757575;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        #googleSignInButton:hover {
-            background-color: #f7f8f8;
-        }
-        #googleSignInButton img {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
-        }
     </style>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="login-container">
@@ -128,16 +86,6 @@
             
             <button type="submit">Login</button>
         </form>
-
-        <div class="or-divider">
-            <span>OR</span>
-        </div>
-
-        <button id="googleSignInButton">
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
-            Sign in with Google
-        </button>
-
         <div class="register-link">
             <p>Don't have an account? <a href="register.html">Sign Up</a></p>
         </div>
@@ -169,8 +117,8 @@
             if (password === '') {
                 passwordError.textContent = 'Password is required';
                 isValid = false;
-            } else if (password.length < 8) {
-                passwordError.textContent = 'Password must be at least 8 characters long';
+            } else if (password.length < 4) {
+                passwordError.textContent = 'Password must be at least 4 characters long';
                 isValid = false;
             }
 
@@ -193,54 +141,17 @@
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
+
                     alert('Login successful');
                     window.location.href = 'attendance.html';
                 } else {
-                    alert('Login failed: ' + (data.message || 'Unknown error'));
+                    alert('Login failed');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred during login');
             });
         }
-
-        function handleCredentialResponse(response) {
-            fetch('https://riteshinternship-khaki.vercel.app/api/google-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ token: response.credential })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.userId);
-                    alert('Google Sign-In successful');
-                    window.location.href = 'attendance.html';
-                } else {
-                    alert('Google Sign-In failed: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred during Google Sign-In');
-            });
-        }
-
-        google.accounts.id.initialize({
-            client_id: '162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com',
-            callback: handleCredentialResponse
-        });
-
-        google.accounts.id.renderButton(
-            document.getElementById('googleSignInButton'),
-            { theme: 'outline', size: 'large' }
-        );
-
-        google.accounts.id.prompt();
     </script>
 </body>
 </html>
