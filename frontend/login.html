@@ -181,8 +181,7 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // In a real application, use HTTPS
-            fetch('https://your-api-endpoint.com/api/login', {
+            fetch('https://riteshinternship-khaki.vercel.app/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -195,7 +194,7 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
                     alert('Login successful');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'attendance.html';
                 } else {
                     alert('Login failed: ' + (data.message || 'Unknown error'));
                 }
@@ -206,10 +205,8 @@
             });
         }
 
-        // Google Sign-In Configuration
         function handleCredentialResponse(response) {
-            // Send the ID token to your server
-            fetch('https://your-api-endpoint.com/api/google-login', {
+            fetch('https://riteshinternship-khaki.vercel.app/api/google-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -222,7 +219,7 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
                     alert('Google Sign-In successful');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'attendance.html';
                 } else {
                     alert('Google Sign-In failed: ' + (data.message || 'Unknown error'));
                 }
@@ -233,16 +230,17 @@
             });
         }
 
-        // Initialize Google Sign-In
         google.accounts.id.initialize({
-            client_id: 162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com //  Google Client ID
+            client_id: '162455221905-3tt6vhschk573tfunuj06g22h6pc161l.apps.googleusercontent.com',
             callback: handleCredentialResponse
         });
 
-        // Render Google Sign-In button
-        document.getElementById('googleSignInButton').addEventListener('click', () => {
-            google.accounts.id.prompt();
-        });
+        google.accounts.id.renderButton(
+            document.getElementById('googleSignInButton'),
+            { theme: 'outline', size: 'large' }
+        );
+
+        google.accounts.id.prompt();
     </script>
 </body>
 </html>
