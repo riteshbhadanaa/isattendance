@@ -34,7 +34,7 @@ document.getElementById('viewRecords').addEventListener('click', function() {
         return;
     }
 
-    fetch('http://localhost:3000/api/records', {
+    fetch('riteshinternship-khaki.vercel.app/api/records', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`
