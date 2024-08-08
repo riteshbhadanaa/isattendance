@@ -61,7 +61,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         };
 
         // Post data to server
-        fetch('https://riteshinternship-khaki.vercel.app/api/register', {
+        fetch('https://ritesh-peach.vercel.app/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
